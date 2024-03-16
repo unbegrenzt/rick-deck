@@ -18,7 +18,7 @@ import { useVirtualizer } from '@tanstack/react-virtual'
 
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-import { fetchData, Person, PersonApiResponse } from '../services/makeData'
+import { fetchData, Person, PersonApiResponse } from 'services/makeData'
 
 const fetchSize = 50;
 
