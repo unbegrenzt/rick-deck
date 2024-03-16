@@ -1,19 +1,33 @@
 import { faker } from '@faker-js/faker'
 import { ColumnSort, SortingState } from '@tanstack/react-table'
 
-export type Person = {
-  id: number
-  firstName: string
-  lastName: string
-  age: number
-  visits: number
-  progress: number
-  status: 'relationship' | 'complicated' | 'single'
-  createdAt: Date
+type CharacterOrigin = {
+  name: string;
+  url: string;
+}
+
+type CharacterLocation = {
+  name: string;
+  url: string;
+}
+
+export type Character = {
+  id: number;
+  name: string;
+  status: 'Alive' | 'Dead' | 'unknown'
+  species: string;
+  type: string;
+  gender: 'Female' | 'Male' | 'Genderless' | 'unknown'
+  origin: CharacterOrigin;
+  location: CharacterLocation;
+  image: string;
+  episode: string[];
+  url: string;
+  created: Date;
 }
 
 export type PersonApiResponse = {
-  data: Person[]
+  data: Character[]
   meta: {
     totalRowCount: number
   }
@@ -27,29 +41,45 @@ const range = (len: number) => {
   return arr
 }
 
-const newPerson = (index: number): Person => {
+const newCharacter = (index: number): Character => {
   return {
     id: index + 1,
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
-    age: faker.number.int(40),
-    visits: faker.number.int(1000),
-    progress: faker.number.int(100),
-    createdAt: faker.date.anytime(),
-    status: faker.helpers.shuffle<Person['status']>([
-      'relationship',
-      'complicated',
-      'single',
-      ])[0]!,
-  }
-}
+    name: faker.person.firstName(),
+    status: faker.helpers.shuffle<Character['status']>([
+      'Alive',
+      'Dead',
+      'unknown',
+    ])[0]!,
+    species: faker.person.lastName(),
+    type: faker.color.human(),
+    gender: faker.helpers.shuffle<Character['gender']>([
+      'Female',
+      'Male',
+      'Genderless',
+      'unknown',
+    ])[0]!,
+    origin: {
+      name: faker.location.city(),
+      url: faker.internet.url(),
+    },
+    location: {
+      name: faker.location.city(),
+      url: faker.internet.url(),
+    },
+    image: faker.image.avatar(),
+    episode: [faker.internet.url()],
+    url: faker.internet.url(),
+    created: faker.date.recent(),
+  };
+};
+
 
 export function makeData(...lens: number[]) {
-  const makeDataLevel = (depth = 0): Person[] => {
+  const makeDataLevel = (depth = 0): Character[] => {
     const len = lens[depth]!
-    return range(len).map((d): Person => {
+    return range(len).map((d): Character => {
       return {
-        ...newPerson(d),
+        ...newCharacter(d),
       }
     })
   }
@@ -64,11 +94,11 @@ export const fetchData = async (
   start: number,
   size: number,
   sorting: SortingState
-  ) => {
+) => {
   const dbData = [...data]
   if (sorting.length) {
     const sort = sorting[0] as ColumnSort
-    const { id, desc } = sort as { id: keyof Person; desc: boolean }
+    const { id, desc } = sort as { id: keyof Character; desc: boolean }
     dbData.sort((a, b) => {
       if (desc) {
         return a[id] < b[id] ? 1 : -1
