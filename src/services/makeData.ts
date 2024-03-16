@@ -26,7 +26,7 @@ export type Character = {
   created: Date;
 }
 
-export type PersonApiResponse = {
+export type CharacterApiResponse = {
   data: Character[]
   meta: {
     totalRowCount: number
