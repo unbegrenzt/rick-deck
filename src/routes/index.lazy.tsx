@@ -1,45 +1,37 @@
 import React from 'react'
 
 import {
+  Column,
+  Table as ReactTable,
+  PaginationState,
+  useReactTable,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
   ColumnDef,
   flexRender,
-  getCoreRowModel,
   getSortedRowModel,
-  OnChangeFn,
-  Row,
-  SortingState,
-  useReactTable,
 } from '@tanstack/react-table'
-import {
-  keepPreviousData,
-  useInfiniteQuery,
-} from '@tanstack/react-query'
-import { useVirtualizer } from '@tanstack/react-virtual'
 
 import { createLazyFileRoute } from '@tanstack/react-router'
 
-import { fetchData, Character, CharacterApiResponse } from 'services/makeData'
-
+//custom components
+import { createData, Character } from 'services/makeData'
 import RickCard from 'components/molecules/RickCard'
-
-const fetchSize = 50;
+import PaginationBar from 'src/components/molecules/PaginationBar'
 
 export const Route = createLazyFileRoute('/')({
   component: Index,
 })
 
 function Index() {
-  //we need a reference to the scrolling element for logic down below
-  const tableContainerRef = React.useRef<HTMLDivElement>(null)
-
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [selectedCharacters, setSelectedCharacters] = React.useState({});
+  const rerender = React.useReducer(() => ({}), {})[1]
 
   const columns = React.useMemo<ColumnDef<Character>[]>(
     () => [
       {
         id: 'rickCard',
-        header: 'Rick Card',
+        header: '',
         cell: ({ row }) => (
           <RickCard
             character={row.original}
@@ -49,219 +41,242 @@ function Index() {
             onChange={row.getToggleSelectedHandler()}
           />
         ),
-      },
+      }
     ],
     []
   )
 
-  //react-query has a useInfiniteQuery hook that is perfect for this use case
-  const { data, fetchNextPage, isFetching, isLoading } =
-    useInfiniteQuery<CharacterApiResponse>({
-      queryKey: [
-        'people',
-        sorting, //refetch when sorting changes
-      ],
-      queryFn: async ({ pageParam = 0 }) => {
-        const start = (pageParam as number) * fetchSize
-        const fetchedData = await fetchData(start, fetchSize, sorting) //pretend api call
-        return fetchedData
-      },
-      initialPageParam: 0,
-      getNextPageParam: (_lastGroup, groups) => groups.length,
-      refetchOnWindowFocus: false,
-      placeholderData: keepPreviousData,
-    })
-
-  //flatten the array of arrays from the useInfiniteQuery hook
-  const flatData = React.useMemo(
-    () => data?.pages?.flatMap(page => page.data) ?? [],
-    [data]
-  )
-  const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0
-  const totalFetched = flatData.length
-
-  //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
-  const fetchMoreOnBottomReached = React.useCallback(
-    (containerRefElement?: HTMLDivElement | null) => {
-      if (containerRefElement) {
-        const { scrollHeight, scrollTop, clientHeight } = containerRefElement
-        //once the user has scrolled within 500px of the bottom of the table, fetch more data if we can
-        if (
-          scrollHeight - scrollTop - clientHeight < 500 &&
-          !isFetching &&
-          totalFetched < totalDBRowCount
-        ) {
-          fetchNextPage()
-        }
-      }
-    },
-    [fetchNextPage, isFetching, totalFetched, totalDBRowCount]
-  )
-
-  //a check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
-  React.useEffect(() => {
-    fetchMoreOnBottomReached(tableContainerRef.current)
-  }, [fetchMoreOnBottomReached])
-
-  const table = useReactTable({
-    data: flatData,
-    columns,
-    state: {
-      rowSelection: selectedCharacters,
-      sorting,
-    },
-    enableRowSelection: () => Object.keys(selectedCharacters).length <= 3,
-    onRowSelectionChange: setSelectedCharacters,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    manualSorting: true,
-    debugTable: true,
-  })
-
-  //scroll to top of table when sorting changes
-  const handleSortingChange: OnChangeFn<SortingState> = updater => {
-    setSorting(updater)
-    if (!!table.getRowModel().rows.length) {
-      rowVirtualizer.scrollToIndex?.(0)
-    }
-  }
-
-  //since this table option is derived from table row model state, we're using the table.setOptions utility
-  table.setOptions(prev => ({
-    ...prev,
-    onSortingChange: handleSortingChange,
-  }))
-
-  const { rows } = table.getRowModel()
-
-  const rowVirtualizer = useVirtualizer({
-    count: rows.length,
-    estimateSize: () => 33, //estimate row height for accurate scrollbar dragging
-    getScrollElement: () => tableContainerRef.current,
-    //measure dynamic row height, except in firefox because it measures table border height incorrectly
-    measureElement:
-      typeof window !== 'undefined' &&
-        navigator.userAgent.indexOf('Firefox') === -1
-        ? element => element?.getBoundingClientRect().height
-        : undefined,
-    overscan: 5,
-  })
-
-  if (isLoading) {
-    return <>Loading...</>
-  }
+  const [data, setData] = React.useState(() => createData(10))
+  const refreshData = () => setData(() => createData(10))
 
   return (
-    <div className="app">
-      {import.meta.env.NODE_ENV === 'development' ? (
-        <p>
-          <strong>Notice:</strong> You are currently running React in
-          development mode. Virtualized rendering performance will be slightly
-          degraded until this application is built for production.
-        </p>
-      ) : null}
-      ({flatData.length} of {totalDBRowCount} rows fetched)
-      <div
-        className="container"
-        onScroll={e => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
-        ref={tableContainerRef}
-        style={{
-          overflow: 'auto', //our scrollable table container
-          position: 'relative', //needed for sticky header
-          height: '600px', //should be a fixed height
+    <>
+      <Table
+        {...{
+          data,
+          columns,
         }}
-      >
-        {/* Even though we're still using sematic table tags, we must use CSS grid and flexbox for dynamic row heights */}
-        <table style={{ display: 'grid' }}>
-          <thead
-            style={{
-              display: 'grid',
-              position: 'sticky',
-              top: 0,
-              zIndex: 1,
-            }}
-          >
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr
-                key={headerGroup.id}
-                style={{ display: 'flex', width: '100%' }}
-              >
-                {headerGroup.headers.map(header => {
-                  return (
-                    <th
-                      key={header.id}
-                      style={{
-                        display: 'flex',
-                        width: header.getSize(),
+      />
+      <hr />
+      <div>
+        <button onClick={() => rerender()}>Force Rerender</button>
+      </div>
+      <div>
+        <button onClick={() => refreshData()}>Refresh Data</button>
+      </div>
+    </>
+  )
+}
+
+function Table({
+  data,
+  columns,
+}: {
+  data: Character[]
+  columns: ColumnDef<Character>[]
+}) {
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 3,
+  })
+
+  const [selectedCharacters, setSelectedCharacters] = React.useState({});
+
+  const table = useReactTable({
+    columns,
+    data,
+    debugTable: true,
+    enableRowSelection: () => Object.keys(selectedCharacters).length <= 3,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    onRowSelectionChange: setSelectedCharacters,
+    //no need to pass pageCount or rowCount with client-side pagination as it is calculated automatically
+    state: {
+      pagination,
+      rowSelection: selectedCharacters
+    },
+    // autoResetPageIndex: false, // turn off page index reset when sorting or filtering
+  })
+
+  return (
+    <div className="p-2">
+      <div className="h-2" />
+      <table>
+        <thead>
+          {table.getHeaderGroups().map(headerGroup => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map(header => {
+                return (
+                  <th key={header.id} colSpan={header.colSpan}>
+                    <div
+                      {...{
+                        className: header.column.getCanSort()
+                          ? 'cursor-pointer select-none'
+                          : '',
+                        onClick: header.column.getToggleSortingHandler(),
                       }}
                     >
-                      <div
-                        {...{
-                          className: header.column.getCanSort()
-                            ? 'cursor-pointer select-none'
-                            : '',
-                          onClick: header.column.getToggleSortingHandler(),
-                        }}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {{
-                          asc: ' 🔼',
-                          desc: ' 🔽',
-                        }[header.column.getIsSorted() as string] ?? null}
-                      </div>
-                    </th>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                      {{
+                        asc: ' 🔼',
+                        desc: ' 🔽',
+                      }[header.column.getIsSorted() as string] ?? null}
+                      {header.column.getCanFilter() ? (
+                        <div>
+                          <Filter column={header.column} table={table} />
+                        </div>
+                      ) : null}
+                    </div>
+                  </th>
+                )
+              })}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map(row => {
+            return (
+              <tr key={row.id}>
+                {row.getVisibleCells().map(cell => {
+                  return (
+                    <td key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
                   )
                 })}
               </tr>
-            ))}
-          </thead>
-          <tbody
-            style={{
-              display: 'grid',
-              height: `${rowVirtualizer.getTotalSize()}px`, //tells scrollbar how big the table is
-              position: 'relative', //needed for absolute positioning of rows
+            )
+          })}
+        </tbody>
+      </table>
+      <div className="h-2" />
+      <PaginationBar table={table} />
+      <div className="flex items-center gap-2">
+        <button
+          className="border rounded p-1"
+          onClick={() => table.firstPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {'<<'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {'<'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {'>'}
+        </button>
+        <button
+          className="border rounded p-1"
+          onClick={() => table.lastPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {'>>'}
+        </button>
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{' '}
+            {table.getPageCount().toLocaleString()}
+          </strong>
+        </span>
+        <span className="flex items-center gap-1">
+          | Go to page:
+          <input
+            type="number"
+            defaultValue={table.getState().pagination.pageIndex + 1}
+            onChange={e => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0
+              table.setPageIndex(page)
             }}
-          >
-            {rowVirtualizer.getVirtualItems().map(virtualRow => {
-              const row = rows[virtualRow.index] as Row<Character>
-              return (
-                <tr
-                  data-index={virtualRow.index} //needed for dynamic row height measurement
-                  ref={node => rowVirtualizer.measureElement(node)} //measure dynamic row height
-                  key={row.id}
-                  style={{
-                    display: 'flex',
-                    position: 'absolute',
-                    transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
-                    width: '100%',
-                  }}
-                >
-                  {row.getVisibleCells().map(cell => {
-                    return (
-                      <td
-                        key={cell.id}
-                        style={{
-                          display: 'flex',
-                          width: cell.column.getSize(),
-                        }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+            className="border p-1 rounded w-16"
+          />
+        </span>
+        <select
+          value={table.getState().pagination.pageSize}
+          onChange={e => {
+            table.setPageSize(Number(e.target.value))
+          }}
+        >
+          {[10, 20, 30, 40, 50].map(pageSize => (
+            <option key={pageSize} value={pageSize}>
+              Show {pageSize}
+            </option>
+          ))}
+        </select>
       </div>
-      {isFetching && <div>Fetching More...</div>}
+      <div>
+        Showing {table.getRowModel().rows.length.toLocaleString()} of{' '}
+        {table.getRowCount().toLocaleString()} Rows
+      </div>
+      <pre>{JSON.stringify(table.getState().pagination, null, 2)}</pre>
     </div>
+  )
+}
+
+function Filter({
+  column,
+  table,
+}: {
+  column: Column<any, any>
+  table: ReactTable<any>
+}) {
+  const firstValue = table
+    .getPreFilteredRowModel()
+    .flatRows[0]?.getValue(column.id)
+
+  const columnFilterValue = column.getFilterValue()
+
+  return typeof firstValue === 'number' ? (
+    <div className="flex space-x-2">
+      <input
+        type="number"
+        value={(columnFilterValue as [number, number])?.[0] ?? ''}
+        onChange={e =>
+          column.setFilterValue((old: [number, number]) => [
+            e.target.value,
+            old?.[1],
+          ])
+        }
+        placeholder={`Min`}
+        className="w-24 border shadow rounded"
+      />
+      <input
+        type="number"
+        value={(columnFilterValue as [number, number])?.[1] ?? ''}
+        onChange={e =>
+          column.setFilterValue((old: [number, number]) => [
+            old?.[0],
+            e.target.value,
+          ])
+        }
+        placeholder={`Max`}
+        className="w-24 border shadow rounded"
+      />
+    </div>
+  ) : (
+    <input
+      type="text"
+      value={(columnFilterValue ?? '') as string}
+      onChange={e => column.setFilterValue(e.target.value)}
+      placeholder={`Search...`}
+      className="w-36 border shadow rounded"
+    />
   )
 }

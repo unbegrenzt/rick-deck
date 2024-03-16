@@ -117,3 +117,16 @@ export const fetchData = async (
     },
   }
 }
+
+export function createData(...lens: number[]) {
+  const makeDataLevel = (depth = 0): Character[] => {
+    const len = lens[depth]!
+    return range(len).map((d): Character => {
+      return {
+        ...newCharacter(d)
+      }
+    })
+  }
+
+  return makeDataLevel()
+}
