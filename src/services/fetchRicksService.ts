@@ -12,10 +12,12 @@ type CharacterOrigin = {
 
 export type MetaParameters = {
   isPaginationVisible: boolean,
+  isRefetchOnAction: boolean
 }
 
 export const defaultMetaParameters: MetaParameters = {
   isPaginationVisible: true,
+  isRefetchOnAction: false
 }
 
 type CharacterLocation = {

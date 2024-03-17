@@ -37,21 +37,17 @@ export default function RicksTable({
   const updateFavorites = useFavoriteStore((state) => state.updateFavorites)
   const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
 
-  useEffect(() => {
-    updateFavorites(selectedCharacters);
-  }, [selectedCharacters]);
-
-  const defaultData = useMemo(() => [], [])
-
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   })
 
+  const defaultData = useMemo(() => [], [])
+
   const dataQuery = useQuery({
     queryKey: ['data', pagination],
     queryFn: () => fetcher(pagination, { data: favCharacters }),
-    placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
+    placeholderData: keepPreviousData,
   })
 
   const table = useReactTable({
@@ -73,6 +69,16 @@ export default function RicksTable({
     },
     manualPagination: true,
   });
+
+  useEffect(() => {
+    if (meta.isRefetchOnAction) {
+      dataQuery.refetch();
+    }
+  }, [favCharacters]);
+
+  useEffect(() => {
+    updateFavorites(selectedCharacters);
+  }, [selectedCharacters]);
 
   return (
     <div className="p-2">

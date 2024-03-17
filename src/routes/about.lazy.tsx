@@ -50,7 +50,8 @@ function About() {
         columns,
         fetcher: fetchRicksData,
         meta: {
-          isPaginationVisible: false
+          isPaginationVisible: false,
+          isRefetchOnAction: true
         }
       }}
     />
