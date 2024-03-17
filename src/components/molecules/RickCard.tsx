@@ -1,6 +1,6 @@
 import {
   Character
-} from 'services/makeData';
+} from 'src/services/fetchRicksService';
 
 import HeartCheckbox from 'components/atoms/HeartCheckbox';
 
@@ -32,7 +32,8 @@ export default function RickCard({
 
       <img
         className='w-24 lg:w-36 h-24 lg:h-36 rounded-lg self-center'
-        src={'https://rickandmortyapi.com/api/character/avatar/2.jpeg'} />
+        src={character.image}
+      />
 
       <div className='flex flex-col rounded-lg p-2 lg:w-2/3 gap-2 bg-[#606C38] text-[#FEFAE0]'>
         <section>
