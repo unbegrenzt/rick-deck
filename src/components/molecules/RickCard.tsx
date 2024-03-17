@@ -2,33 +2,18 @@ import {
   Character
 } from 'src/services/fetchRicksService';
 
-import HeartCheckbox from 'components/atoms/HeartCheckbox';
-
-
 export default function RickCard({
   character,
-  checked,
-  disabled,
-  indeterminate,
-  onChange
+  actionButton,
 }: {
   character: Character
-  checked: boolean
-  disabled: boolean
-  indeterminate: boolean
-  onChange: (event: unknown) => void
+  actionButton: React.ReactNode
 }) {
 
   return (
     <article className="flex flex-col lg:flex-row justify-around md:min-h-80 lg:min-h-36 p-5 rounded-lg bg-gray-200 gap-5">
-      <HeartCheckbox
-        {...{
-          checked: checked,
-          disabled: disabled,
-          indeterminate: indeterminate,
-          onChange: onChange,
-        }}
-      />
+
+      {actionButton}
 
       <img
         className='w-24 lg:w-36 h-24 lg:h-36 rounded-lg self-center'
