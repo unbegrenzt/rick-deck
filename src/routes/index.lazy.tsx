@@ -46,8 +46,8 @@ function Index() {
     []
   )
 
-  const [data, setData] = React.useState(() => createData(10))
-  const refreshData = () => setData(() => createData(10))
+  const [data, setData] = React.useState(() => createData(50))
+  const refreshData = () => setData(() => createData(50))
 
   return (
     <>
@@ -77,7 +77,7 @@ function Table({
 }) {
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 3,
+    pageSize: 10,
   })
 
   const [selectedCharacters, setSelectedCharacters] = React.useState({});
@@ -104,7 +104,7 @@ function Table({
   return (
     <div className="p-2">
       <div className="h-2" />
-      <table>
+      <table className='w-full'>
         <thead>
           {table.getHeaderGroups().map(headerGroup => (
             <tr key={headerGroup.id}>
@@ -139,13 +139,13 @@ function Table({
             </tr>
           ))}
         </thead>
-        <tbody>
+        <tbody className='flex flex-col gap-3 mb-2/3'>
           {table.getRowModel().rows.map(row => {
             return (
-              <tr key={row.id}>
+              <tr className='flex justify-center' key={row.id}>
                 {row.getVisibleCells().map(cell => {
                   return (
-                    <td key={cell.id}>
+                    <td className='w-3/4' key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -158,74 +158,8 @@ function Table({
           })}
         </tbody>
       </table>
-      <div className="h-2" />
+      <div className="h-32" />
       <PaginationBar table={table} />
-      <div className="flex items-center gap-2">
-        <button
-          className="border rounded p-1"
-          onClick={() => table.firstPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {'<<'}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          {'<'}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {'>'}
-        </button>
-        <button
-          className="border rounded p-1"
-          onClick={() => table.lastPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          {'>>'}
-        </button>
-        <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount().toLocaleString()}
-          </strong>
-        </span>
-        <span className="flex items-center gap-1">
-          | Go to page:
-          <input
-            type="number"
-            defaultValue={table.getState().pagination.pageIndex + 1}
-            onChange={e => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0
-              table.setPageIndex(page)
-            }}
-            className="border p-1 rounded w-16"
-          />
-        </span>
-        <select
-          value={table.getState().pagination.pageSize}
-          onChange={e => {
-            table.setPageSize(Number(e.target.value))
-          }}
-        >
-          {[10, 20, 30, 40, 50].map(pageSize => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        Showing {table.getRowModel().rows.length.toLocaleString()} of{' '}
-        {table.getRowCount().toLocaleString()} Rows
-      </div>
-      <pre>{JSON.stringify(table.getState().pagination, null, 2)}</pre>
     </div>
   )
 }
