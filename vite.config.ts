@@ -8,4 +8,15 @@ export default defineConfig({
     react(),
     TanStackRouterVite(),
   ],
+  resolve: {
+    alias: {
+      src: "/src",
+      assets: "/src/assets",
+      components: "/src/components",
+      hooks: "/src/hooks",
+      services: "/src/services",
+      store: "/src/store",
+      utils: "/src/utils",
+    },
+  },
 })
