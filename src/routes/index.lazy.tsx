@@ -139,13 +139,13 @@ function Table({
             </tr>
           ))}
         </thead>
-        <tbody className='flex flex-col gap-3 mb-2/3'>
+        <tbody className='flex flex-col md:grid md:grid-cols-3 lg:grid-cols-3 gap-3 mb-2/3'>
           {table.getRowModel().rows.map(row => {
             return (
               <tr className='flex justify-center' key={row.id}>
                 {row.getVisibleCells().map(cell => {
                   return (
-                    <td className='w-3/4' key={cell.id}>
+                    <td className='w-3/4 md:w-5/6 lg:w-11/12 cursor-default' key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
