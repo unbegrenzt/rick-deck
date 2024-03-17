@@ -1,12 +1,23 @@
 import { faker } from '@faker-js/faker'
-import { ColumnSort, SortingState } from '@tanstack/react-table'
+import { ColumnSort, RowSelectionState, SortingState } from '@tanstack/react-table'
 import {
   PaginationState,
 } from '@tanstack/react-table'
+import { ensureCharacterArray } from 'utils/objectMapUtil';
 
 type CharacterOrigin = {
   name: string;
   url: string;
+}
+
+export type MetaParameters = {
+  isPaginationVisible: boolean,
+  isRefetchOnAction: boolean
+}
+
+export const defaultMetaParameters: MetaParameters = {
+  isPaginationVisible: true,
+  isRefetchOnAction: false
 }
 
 type CharacterLocation = {
@@ -140,22 +151,32 @@ export function createData(...lens: number[]) {
   return makeDataLevel()
 }
 
-const fakeRicksData = makeData(100);
+export type FetcherMeta = {
+  data: RowSelectionState
+}
 
-export async function fetchRicksData(options: {
-  pageIndex: number
-  pageSize: number
-}) {
-  // Simulate some network latency
-  await new Promise(r => setTimeout(r, 1500))
+export async function fetchRicksData(options: PaginationState, meta: FetcherMeta) {
+
+  const RICKS_MORTY_API_URL = import.meta.env.VITE_RICKS_MORTY_API_URL;
+  if (!RICKS_MORTY_API_URL) {
+    throw new Error('RICKS_MORTY_API_URL no está definido en las variables de entorno.');
+  }
+
+  let data: Character[];
+
+  if (Object.keys(meta.data).length > 0) {
+    const response = await fetch(
+      `${RICKS_MORTY_API_URL}/character/${Object.keys(meta.data)}`
+    );
+    data = await response.json();
+  } else {
+    data = []
+  }
 
   return {
-    rows: fakeRicksData.slice(
-      options.pageIndex * options.pageSize,
-      (options.pageIndex + 1) * options.pageSize
-    ),
-    pageCount: Math.ceil(fakeRicksData.length / options.pageSize),
-    rowCount: fakeRicksData.length,
+    rows: ensureCharacterArray(data),
+    pageCount: Math.ceil(data.length / options.pageSize),
+    rowCount: data.length,
   }
 }
 

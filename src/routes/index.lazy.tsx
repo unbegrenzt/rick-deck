@@ -7,9 +7,10 @@ import {
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 //custom components
-import { fetchFromServer, Character } from 'src/services/fetchRicksService'
+import { fetchFromServer, Character, defaultMetaParameters } from 'services/fetchRicksService'
 import RickCard from 'components/molecules/RickCard'
 import RicksTable from 'components/organisms/RicksTable'
+import HeartCheckbox from 'components/atoms/HeartCheckbox'
 
 export const Route = createLazyFileRoute('/')({
   component: Index,
@@ -25,10 +26,16 @@ function Index() {
         cell: ({ row }) => (
           <RickCard
             character={row.original}
-            checked={row.getIsSelected()}
-            disabled={!row.getCanSelect()}
-            indeterminate={row.getIsSomeSelected()}
-            onChange={row.getToggleSelectedHandler()}
+            actionButton={(
+              <HeartCheckbox
+                {...{
+                  checked: row.getIsSelected(),
+                  disabled: !row.getCanSelect(),
+                  indeterminate: row.getIsSomeSelected(),
+                  onChange: row.getToggleSelectedHandler(),
+                }}
+              />
+            )}
           />
         ),
       }
@@ -40,7 +47,8 @@ function Index() {
     <RicksTable
       {...{
         columns,
-        fetcher: fetchFromServer
+        fetcher: fetchFromServer,
+        meta: defaultMetaParameters
       }}
     />
   )

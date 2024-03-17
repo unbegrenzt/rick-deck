@@ -1,9 +1,19 @@
 import IconButton from "components/atoms/IconButton";
 
-const PaginationBar = ({ table }) => {
+import {
+  Table
+} from '@tanstack/react-table'
+
+import { Character } from "services/fetchRicksService";
+
+const PaginationBar = ({
+  table
+}: {
+  table: Table<Character>
+}) => {
   return (
-    <div className={`fixed bottom-20 inset-x-0 left-1/2 transform -translate-x-1/2 
-        z-10 p-4 
+    <div className={`fixed bottom-20 inset-x-0 left-1/2 transform -translate-x-1/2
+        z-10 p-4
       bg-[#606C38] text-[#FEFAE0] flex justify-center items-center
         w-3/5 rounded-full`}>
       <div className="flex items-center gap-2">

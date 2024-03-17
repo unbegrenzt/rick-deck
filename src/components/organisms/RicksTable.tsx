@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import {
   PaginationState,
@@ -9,6 +9,7 @@ import {
   ColumnDef,
   flexRender,
   getSortedRowModel,
+  RowSelectionState,
 } from '@tanstack/react-table'
 
 import {
@@ -17,27 +18,36 @@ import {
 } from '@tanstack/react-query'
 
 //custom components
-import { Character, FetcherResult } from 'services/fetchRicksService'
+import { defaultMetaParameters, MetaParameters, Character, FetcherResult, FetcherMeta } from 'services/fetchRicksService'
 import PaginationBar from 'components/molecules/PaginationBar'
+
+import useFavoriteStore from 'store/useFavoriteStore';
 
 export default function RicksTable({
   columns,
-  fetcher
-}: { columns: ColumnDef<Character>[], fetcher: (options: PaginationState) => Promise<FetcherResult> }) {
+  fetcher,
+  meta = defaultMetaParameters
+}: {
+  columns: ColumnDef<Character>[],
+  fetcher: (options: PaginationState, meta: FetcherMeta) => Promise<FetcherResult>
+  meta?: MetaParameters
+}) {
 
-  const [selectedCharacters, setSelectedCharacters] = React.useState({});
-
-  const defaultData = useMemo(() => [], [])
+  const favCharacters = useFavoriteStore((state) => state.favCharacters)
+  const updateFavorites = useFavoriteStore((state) => state.updateFavorites)
+  const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
 
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   })
 
+  const defaultData = useMemo(() => [], [])
+
   const dataQuery = useQuery({
     queryKey: ['data', pagination],
-    queryFn: () => fetcher(pagination),
-    placeholderData: keepPreviousData, // don't have 0 rows flash while changing pages/loading next page
+    queryFn: () => fetcher(pagination, { data: favCharacters }),
+    placeholderData: keepPreviousData,
   })
 
   const table = useReactTable({
@@ -46,6 +56,7 @@ export default function RicksTable({
     debugTable: true,
     rowCount: dataQuery.data?.rowCount,
     enableRowSelection: () => Object.keys(selectedCharacters).length <= 3,
+    getRowId: row => `${row.id}`,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -57,7 +68,17 @@ export default function RicksTable({
       rowSelection: selectedCharacters
     },
     manualPagination: true,
-  })
+  });
+
+  useEffect(() => {
+    if (meta.isRefetchOnAction) {
+      dataQuery.refetch();
+    }
+  }, [favCharacters]);
+
+  useEffect(() => {
+    updateFavorites(selectedCharacters);
+  }, [selectedCharacters]);
 
   return (
     <div className="p-2">
@@ -108,7 +129,9 @@ export default function RicksTable({
         </tbody>
       </table>
       <div className="h-32" />
-      <PaginationBar table={table} />
+      {meta.isPaginationVisible && (
+        <PaginationBar table={table} />
+      )}
     </div>
   )
 }
