@@ -15,7 +15,8 @@ const PaginationBar = ({
     <div className={`fixed bottom-20 inset-x-0 left-1/2 transform -translate-x-1/2
         z-10 p-4
       bg-[#606C38] text-[#FEFAE0] flex justify-center items-center
-        w-3/5 rounded-full`}>
+        w-3/5 md:w-5/12 lg:w-4/12
+        rounded-full`}>
       <div className="flex items-center gap-2">
         <IconButton
           onClick={() => table.firstPage()}

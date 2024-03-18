@@ -116,7 +116,7 @@ export default function RicksTable({
             </tr>
           ))}
         </thead>
-        <tbody className='flex flex-col md:grid md:grid-cols-3 lg:grid-cols-3 gap-3 mb-2/3'>
+        <tbody className='flex flex-col md:grid md:grid-cols-2 lg:grid-cols-2 gap-3 mb-2/3'>
           {table.getRowModel().rows.map(row => {
             return (
               <tr className='flex justify-center' key={row.id}>
@@ -135,7 +135,7 @@ export default function RicksTable({
           })}
         </tbody>
       </table>
-      <div className="h-32" />
+      <div className='h-40' />
       {meta.isPaginationVisible && (
         <PaginationBar table={table} />
       )}
