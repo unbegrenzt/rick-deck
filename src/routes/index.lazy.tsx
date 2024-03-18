@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react'
 
-import 'react-toastify/dist/ReactToastify.min.css';
-
 import {
   ColumnDef,
 } from '@tanstack/react-table'
@@ -53,7 +51,7 @@ function Index() {
   )
 
   useEffect(() => {
-    showToast({ uuid: generateUUIDv4(), message: 'Tienes hasta 3 Mortys en este universo', type: 'info' })
+    showToast({ uuid: generateUUIDv4(), message: 'No podemos tomar mas 3 en este universo', type: 'info' })
   }, [])
 
   return (

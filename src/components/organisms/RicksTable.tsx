@@ -22,6 +22,7 @@ import { defaultMetaParameters, MetaParameters, Character, FetcherResult, Fetche
 import PaginationBar from 'components/molecules/PaginationBar'
 
 import useFavoriteStore from 'store/useFavoriteStore'
+import NoCharacters from 'components/molecules/NoCharacters'
 
 export default function RicksTable({
   columns,
@@ -79,6 +80,12 @@ export default function RicksTable({
   useEffect(() => {
     updateFavorites(selectedCharacters);
   }, [selectedCharacters]);
+
+  if (dataQuery.data?.rows.length === 0) {
+    return(
+      <NoCharacters />
+    )
+  }
 
   return (
     <div className="p-2">

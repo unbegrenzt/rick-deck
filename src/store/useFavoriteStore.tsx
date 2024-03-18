@@ -17,7 +17,7 @@ const useFavoriteStore = create<State & Action, [["zustand/persist", State & Act
   }),
   {
     name: 'favorite-characters-storage',
-    storage: createJSONStorage(() => sessionStorage),
+    storage: createJSONStorage(() => localStorage),
   },
 ))
 
