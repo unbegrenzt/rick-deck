@@ -1,4 +1,4 @@
-import { Character } from "services/fetchRicksService";
+import { Character } from "types/index";
 
 export const ensureCharacterArray = (input: Character[] | Character | []): Character[] | [] => {
   if (typeof input === 'object' && !Array.isArray(input) && input !== null) {
