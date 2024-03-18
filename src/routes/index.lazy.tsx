@@ -6,7 +6,7 @@ import {
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 //custom components
-import { fetchFromServer, Character, defaultMetaParameters } from 'services/fetchRicksService'
+import { fetchFromServer } from 'services/fetchRicksService'
 
 import RickCard from 'components/molecules/RickCard'
 import RicksTable from 'components/organisms/RicksTable'
@@ -14,6 +14,8 @@ import HeartCheckbox from 'components/atoms/HeartCheckbox'
 import ToastContainer from 'components/molecules/ToastContainer';
 
 import useToastStore from 'store/useToastStore';
+
+import { Character, defaultMetaParameters } from 'types/index'
 
 import { generateUUIDv4 } from 'utils/stringsUtil';
 
@@ -51,7 +53,7 @@ function Index() {
   )
 
   useEffect(() => {
-    showToast({ uuid: generateUUIDv4(), message: 'No podemos tomar mas 3 en este universo', type: 'info' })
+    showToast({ uuid: generateUUIDv4(), message: 'No podemos tomar mas de 3 personajes de este universo', type: 'info' })
   }, [])
 
   return (

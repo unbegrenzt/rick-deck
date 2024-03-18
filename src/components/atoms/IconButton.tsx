@@ -1,9 +1,5 @@
 
-interface IconButtonProps {
-  onClick: () => void;
-  disabled?: boolean;
-  children: React.ReactNode;
-}
+import { IconButtonProps } from "types/index";
 
 const IconButton: React.FC<IconButtonProps> = ({ onClick, disabled, children }) => {
   return (

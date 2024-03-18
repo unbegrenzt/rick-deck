@@ -1,3 +1,5 @@
+import { ToastType } from "types/index";
+
 export const generateUUIDv4 = () => {
   const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
   const randomBytes = crypto.getRandomValues(new Uint8Array(16));
@@ -13,3 +15,18 @@ export const generateUUIDv4 = () => {
 
   return uuid;
 };
+
+export function getToastColor(type: ToastType): string {
+  switch (type) {
+    case 'success':
+      return 'bg-green-500';
+    case 'error':
+      return 'bg-red-500';
+    case 'info':
+      return 'bg-blue-500';
+    case 'warning':
+      return 'bg-yellow-500';
+    default:
+      return 'bg-white-500';
+  }
+}

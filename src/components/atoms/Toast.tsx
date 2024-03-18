@@ -1,28 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-export interface ToastProps {
-  uuid: string;
-  message: string;
-  type?: ToastType;
-  duration?: number;
-}
+import { ToastProps } from 'types/index'
 
-type ToastType = 'success' | 'error' | 'info' | 'warning';
-
-function getToastColor(type: ToastType): string {
-  switch (type) {
-    case 'success':
-      return 'bg-green-500';
-    case 'error':
-      return 'bg-red-500';
-    case 'info':
-      return 'bg-blue-500';
-    case 'warning':
-      return 'bg-yellow-500';
-    default:
-      return 'bg-white-500';
-  }
-}
+import { getToastColor } from 'utils/stringsUtil';
 
 const Toast: React.FC<ToastProps> = ({ message, type = 'info', duration = 2500 }) => {
   const [visible, setVisible] = useState(true);

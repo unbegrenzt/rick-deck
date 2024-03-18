@@ -18,7 +18,7 @@ import {
 } from '@tanstack/react-query'
 
 //custom components
-import { defaultMetaParameters, MetaParameters, Character, FetcherResult, FetcherMeta } from 'services/fetchRicksService'
+import { defaultMetaParameters, MetaParameters, Character, FetcherResult, FetcherMeta } from 'types/index'
 import PaginationBar from 'components/molecules/PaginationBar'
 
 import useFavoriteStore from 'store/useFavoriteStore'

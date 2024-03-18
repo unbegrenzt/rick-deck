@@ -4,7 +4,7 @@ import {
   Table
 } from '@tanstack/react-table'
 
-import { Character } from "services/fetchRicksService";
+import { Character } from "types/index";
 
 const PaginationBar = ({
   table
