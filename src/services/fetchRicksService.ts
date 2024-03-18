@@ -17,7 +17,7 @@ export type MetaParameters = {
 
 export const defaultMetaParameters: MetaParameters = {
   isPaginationVisible: true,
-  isRefetchOnAction: false
+  isRefetchOnAction: false,
 }
 
 type CharacterLocation = {

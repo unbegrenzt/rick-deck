@@ -8,18 +8,16 @@ type State = {
 
 type Action = {
   updateFavorites: (favCharacters: State['favCharacters']) => void
-  removeCharacterId: (favCharacters: State['favCharacters']) => void
 }
 
 const useFavoriteStore = create<State & Action, [["zustand/persist", State & Action]]>(persist(
   (set) => ({
     favCharacters: {},
     updateFavorites: (favCharacters) => set(() => ({ favCharacters: favCharacters })),
-    removeCharacterId: (favCharacters) => set(() => ({ favCharacters: favCharacters })),
   }),
   {
     name: 'favorite-characters-storage',
-    storage: createJSONStorage(() => sessionStorage),
+    storage: createJSONStorage(() => localStorage),
   },
 ))
 

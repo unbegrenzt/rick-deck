@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { createLazyFileRoute } from '@tanstack/react-router'
-
 import {
   ColumnDef,
 } from '@tanstack/react-table'
@@ -17,7 +16,6 @@ export const Route = createLazyFileRoute('/about')({
 })
 
 function About() {
-
 
   const columns = React.useMemo<ColumnDef<Character>[]>(
     () => [
@@ -45,15 +43,17 @@ function About() {
   )
 
   return (
-    <RicksTable
-      {...{
-        columns,
-        fetcher: fetchRicksData,
-        meta: {
-          isPaginationVisible: false,
-          isRefetchOnAction: true
-        }
-      }}
-    />
+    <>
+      <RicksTable
+        {...{
+          columns,
+          fetcher: fetchRicksData,
+          meta: {
+            isPaginationVisible: false,
+            isRefetchOnAction: true
+          }
+        }}
+      />
+    </>
   );
 }

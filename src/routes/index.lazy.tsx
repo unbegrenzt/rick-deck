@@ -1,22 +1,29 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import {
   ColumnDef,
 } from '@tanstack/react-table'
-
 import { createLazyFileRoute } from '@tanstack/react-router'
 
 //custom components
 import { fetchFromServer, Character, defaultMetaParameters } from 'services/fetchRicksService'
+
 import RickCard from 'components/molecules/RickCard'
 import RicksTable from 'components/organisms/RicksTable'
 import HeartCheckbox from 'components/atoms/HeartCheckbox'
+import ToastContainer from 'components/molecules/ToastContainer';
+
+import useToastStore from 'store/useToastStore';
+
+import { generateUUIDv4 } from 'utils/stringsUtil';
 
 export const Route = createLazyFileRoute('/')({
   component: Index,
 })
 
 function Index() {
+
+  const showToast = useToastStore((state) => state.showToast);
 
   const columns = React.useMemo<ColumnDef<Character>[]>(
     () => [
@@ -43,13 +50,20 @@ function Index() {
     []
   )
 
+  useEffect(() => {
+    showToast({ uuid: generateUUIDv4(), message: 'No podemos tomar mas 3 en este universo', type: 'info' })
+  }, [])
+
   return (
-    <RicksTable
-      {...{
-        columns,
-        fetcher: fetchFromServer,
-        meta: defaultMetaParameters
-      }}
-    />
+    <>
+      <ToastContainer />
+      <RicksTable
+        {...{
+          columns,
+          fetcher: fetchFromServer,
+          meta: defaultMetaParameters
+        }}
+      />
+    </>
   )
 }

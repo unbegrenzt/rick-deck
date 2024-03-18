@@ -21,7 +21,8 @@ import {
 import { defaultMetaParameters, MetaParameters, Character, FetcherResult, FetcherMeta } from 'services/fetchRicksService'
 import PaginationBar from 'components/molecules/PaginationBar'
 
-import useFavoriteStore from 'store/useFavoriteStore';
+import useFavoriteStore from 'store/useFavoriteStore'
+import NoCharacters from 'components/molecules/NoCharacters'
 
 export default function RicksTable({
   columns,
@@ -35,8 +36,8 @@ export default function RicksTable({
 
   const favCharacters = useFavoriteStore((state) => state.favCharacters)
   const updateFavorites = useFavoriteStore((state) => state.updateFavorites)
-  const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
 
+  const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -80,6 +81,12 @@ export default function RicksTable({
     updateFavorites(selectedCharacters);
   }, [selectedCharacters]);
 
+  if (dataQuery.data?.rows.length === 0) {
+    return(
+      <NoCharacters />
+    )
+  }
+
   return (
     <div className="p-2">
       <div className="h-2" />
@@ -109,7 +116,7 @@ export default function RicksTable({
             </tr>
           ))}
         </thead>
-        <tbody className='flex flex-col md:grid md:grid-cols-3 lg:grid-cols-3 gap-3 mb-2/3'>
+        <tbody className='flex flex-col md:grid md:grid-cols-2 lg:grid-cols-2 gap-3 mb-2/3'>
           {table.getRowModel().rows.map(row => {
             return (
               <tr className='flex justify-center' key={row.id}>
@@ -128,7 +135,7 @@ export default function RicksTable({
           })}
         </tbody>
       </table>
-      <div className="h-32" />
+      <div className='h-40' />
       {meta.isPaginationVisible && (
         <PaginationBar table={table} />
       )}
