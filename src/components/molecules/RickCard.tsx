@@ -24,7 +24,14 @@ export default function RickCard({
             <b>{character.name}</b>
           </h2>
           <div className='flex items-center gap-2 lg:text-md'>
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <div className={`
+              w-3 h-3 rounded-full
+              ${character.status === 'Alive' ? `bg-green-500` :
+                character.status === 'Dead' ? `bg-red-500` :
+                  character.status === 'unknown' ? `bg-[#FEFAE0]` :
+                    `bg-[#DDA15E]`
+              }
+            `}></div>
             <p>
               {`${character.status} - ${character.species}`}
             </p>
