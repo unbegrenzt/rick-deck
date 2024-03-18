@@ -9,7 +9,9 @@ import RicksTable from 'components/organisms/RicksTable';
 import HeartCheckbox from 'components/atoms/HeartCheckbox';
 import RickCard from 'components/molecules/RickCard';
 
-import { fetchRicksData, Character } from 'services/fetchRicksService';
+import { fetchRicksData } from 'services/fetchRicksService';
+
+import { Character } from 'types/index';
 
 export const Route = createLazyFileRoute('/about')({
   component: About,

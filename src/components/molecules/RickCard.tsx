@@ -1,6 +1,4 @@
-import {
-  Character
-} from 'src/services/fetchRicksService';
+import { Character } from "types/index"
 
 export default function RickCard({
   character,

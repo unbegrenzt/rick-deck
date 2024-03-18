@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { ToastProps } from 'src/components/atoms/Toast'
+import { ToastProps } from 'types/index'
 
 type State = {
   toasts: ToastProps[]
