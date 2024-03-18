@@ -21,7 +21,7 @@ import {
 import { defaultMetaParameters, MetaParameters, Character, FetcherResult, FetcherMeta } from 'services/fetchRicksService'
 import PaginationBar from 'components/molecules/PaginationBar'
 
-import useFavoriteStore from 'store/useFavoriteStore';
+import useFavoriteStore from 'store/useFavoriteStore'
 
 export default function RicksTable({
   columns,
@@ -35,8 +35,8 @@ export default function RicksTable({
 
   const favCharacters = useFavoriteStore((state) => state.favCharacters)
   const updateFavorites = useFavoriteStore((state) => state.updateFavorites)
-  const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
 
+  const [selectedCharacters, setSelectedCharacters] = React.useState<RowSelectionState>(favCharacters);
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,

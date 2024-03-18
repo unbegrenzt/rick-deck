@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import {
   ColumnDef,
@@ -44,12 +44,12 @@ function Index() {
   )
 
   return (
-    <RicksTable
-      {...{
-        columns,
-        fetcher: fetchFromServer,
-        meta: defaultMetaParameters
-      }}
-    />
+      <RicksTable
+        {...{
+          columns,
+          fetcher: fetchFromServer,
+          meta: defaultMetaParameters
+        }}
+      />
   )
 }
