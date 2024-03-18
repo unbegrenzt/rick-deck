@@ -8,7 +8,7 @@ export const Route = createRootRoute({
     <>
       <RicksBottomBar />
       <Outlet />
-      <TanStackRouterDevtools />
+      {import.meta.env.VITE_NODE_ENV === 'development' && (<TanStackRouterDevtools />)}
     </>
   ),
 })
